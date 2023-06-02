@@ -4,7 +4,6 @@ import { Card } from './components/card';
 import { useNotesStore } from './notesStore';
 
 function App() {
-	//const [notes, setNotes] = useState<any>([]);
 	const [title, setTitle] = useState<string>('');
 	const [note, setNote] = useState<number>(0);
 	const [comment, setComment] = useState<string>('');
@@ -14,38 +13,28 @@ function App() {
 	const store = useNotesStore.getState();
 	const [editMode, setEditMode] = useState(false);
 
-
-	//const { notes, addNote, deleteNote, updateNote, reset } = useStore();
-
-	// useEffect(() => {
-	// 	setNotes(JSON.parse(localStorage.getItem("notes")));
-	// }, [notes]);
-
-
 	const ajouterNote = () => {
 		console.log("editMode", editMode);
 		if (title.trim() !== '' && comment.trim() !== '') {
-			const nouvelleNote = {
-				title,
-				note,
-				comment,
-				date: new Date().toLocaleDateString()
-			};
-			// localStorage.setItem('notes', JSON.stringify([...notes, nouvelleNote]));
-			//setNotes([...notes, nouvelleNote]);
-			//useStore.setState({ notes: [...notes, nouvelleNote] })
-			store.addNote(nouvelleNote);
-			setTitle('');
-			setNote(0);
-			setComment('');
+			if (note < 0 || note > 20 || isNaN(note)) {
+				alert('La note doit être comprise entre 0 et 20');
+			} else {
+				const nouvelleNote = {
+					title,
+					note,
+					comment,
+					date: new Date().toLocaleDateString()
+				};
+				store.addNote(nouvelleNote);
+				setTitle('');
+				setNote(0);
+				setComment('');
+			}
 		}
 	};
 
 	const supprimerNote = (index) => {
-		// const nouvellesNotes = [...notes];
-		// nouvellesNotes.splice(index, 1);
 		store.deleteNote(index);
-		//setNotes(nouvellesNotes);
 		setSelectedNoteIndex(null);
 		setShowConfirmationModal(false);
 	};
@@ -66,9 +55,9 @@ function App() {
 
 	const modifierNote = (index) => {
 		setSelectedNoteIndex(index);
-		setTitle(store.notes[selectedNoteIndex].title);
-		setNote(store.notes[selectedNoteIndex].note);
-		setComment(store.notes[selectedNoteIndex].comment);
+		setTitle(store.notes[index].title);
+		setNote(store.notes[index].note);
+		setComment(store.notes[index].comment);
 	};
 
 	const enregistrerModification = () => {
@@ -106,6 +95,8 @@ function App() {
 					data-testid='note-number'
 					type="number"
 					id="note"
+					min={0}
+					max={20}
 					value={note}
 					onChange={(e) => setNote(e.target.value)}
 				/>
@@ -122,7 +113,7 @@ function App() {
 			{/* <button onClick={ajouterNote}>Ajouter Note</button> */}
 			{editMode ? (
 				<div>
-					<button onClick={enregistrerModification}>Enregistrer</button>
+					<button data-testid='note-save' onClick={enregistrerModification}>Enregistrer</button>
 					<button onClick={() => setEditMode(false)}>Annuler</button>
 				</div>
 			) : (
